@@ -2,16 +2,15 @@ package javaVersion;
 
 import java.util.*;
 
-/**
- * FA implementation
- * TODO: clean this up later
+/*
+Clean up b4 we create github
  */
 public class javaFa {
     
     abstract class Fa {
         Map<Integer, State> states;
         HashSet<Character> alphabet;
-        ArrayList<Transition> transition;  // probably should rename this to transitions
+        ArrayList<Transition> transition;  //change to transitions
         State startState;
         Map<Integer, Map<Character, HashSet<Integer>>> transitionTable;
 
@@ -85,8 +84,7 @@ public class javaFa {
             
             alphabet.add(arg);
             transition.add(new Transition(toState, fromState, arg));
-            
-            // make sure we have the from state in our table
+        
             if (!transitionTable.containsKey(from)) {
                 transitionTable.put(from, new HashMap<>());
             }
@@ -98,7 +96,7 @@ public class javaFa {
             transitionTable.get(from).get(arg).add(to);
         }
 
-        // gets epsilon closure for a state
+     
         private HashSet<Integer> epsilonClosure(Integer stateId) {
             HashSet<Integer> visited = new HashSet<>();
             Stack<Integer> stack = new Stack<>();
@@ -111,7 +109,7 @@ public class javaFa {
                     
                 visited.add(current);
                 
-                // check for epsilon transitions (\0)
+                // c epsilon transitions  = (\0)
                 if (transitionTable.get(current) != null) {
                     if (transitionTable.get(current).containsKey('\0')) {
                         for (Integer next : transitionTable.get(current).get('\0')) {
@@ -138,16 +136,14 @@ public class javaFa {
         }
 
         Boolean isDeterministic() {
-            // first check for epsilon transitions
+            
             for (Integer stateId : states.keySet()) {
                 Map<Character, HashSet<Integer>> trans = transitionTable.get(stateId);
                 if (trans != null && trans.containsKey('\0')) {
-                    return false;  // found epsilon transition
+                    return false;  
                 }
             }
-            
-            // now check if we have multiple transitions on same symbol
-            for (Integer stateId : states.keySet()) {
+                   for (Integer stateId : states.keySet()) {
                 Map<Character, HashSet<Integer>> trans = transitionTable.get(stateId);
                 if (trans != null) {
                     for (Character symbol : trans.keySet()) {
@@ -161,20 +157,19 @@ public class javaFa {
             return true;
         }
 
-        // converts this NFA to DFA using subset construction
         Nfa convertToDFA() {
             Nfa dfa = new Nfa();
             Map<HashSet<Integer>, Integer> stateMap = new HashMap<>();
             ArrayList<HashSet<Integer>> worklist = new ArrayList<>();
             int counter = 0;
             
-            // start with epsilon closure of start state
             HashSet<Integer> startSet = epsilonClosure(startState.getId());
             worklist.add(startSet);
             stateMap.put(startSet, counter);
             
-            // check if start state should be accepting
-            boolean startAccepting = false;
+       
+          
+             boolean startAccepting = false;
             for (Integer id : startSet) {
                 if (states.get(id).checkFinal()) {
                     startAccepting = true;
@@ -185,19 +180,18 @@ public class javaFa {
             dfa.addState(new State(counter, true, startAccepting));
             counter++;
             
-            // process worklist
             int index = 0;
             while (index < worklist.size()) {
                 HashSet<Integer> currentSet = worklist.get(index);
                 index++;
                 
-                // for each symbol in alphabet
+                
                 for (Character c : alphabet) {
-                    if (c == '\0') continue;  // skip epsilon
+                    if (c == '\0') continue;  
                     
                     HashSet<Integer> nextSet = new HashSet<>();
                     
-                    // find all states reachable from current set on symbol c
+                    // 
                     for (Integer stateId : currentSet) {
                         HashSet<Integer> reachable = getNext(stateId, c);
                         nextSet.addAll(reachable);
@@ -206,19 +200,16 @@ public class javaFa {
                     if (nextSet.isEmpty()) 
                         continue;
                     
-                    // apply epsilon closure to all reachable states
+                    
                     HashSet<Integer> closedSet = new HashSet<>();
                     for (Integer stateId : nextSet) {
                         HashSet<Integer> closure = epsilonClosure(stateId);
                         closedSet.addAll(closure);
                     }
                     
-                    // have we seen this state set before?
                     if (!stateMap.containsKey(closedSet)) {
                         stateMap.put(closedSet, counter);
                         worklist.add(closedSet);
-                        
-                        // check if this new state is accepting
                         boolean accepting = false;
                         for (Integer id : closedSet) {
                             if (states.get(id).checkFinal()) {
@@ -231,7 +222,7 @@ public class javaFa {
                         counter++;
                     }
                     
-                    // add the transition
+ 
                     int fromState = stateMap.get(currentSet);
                     int toState = stateMap.get(closedSet);
                     dfa.addTransition(toState, fromState, c);
@@ -243,26 +234,26 @@ public class javaFa {
 
         @Override
         Boolean accepts(String input) {
-            // start with epsilon closure of start state
+   
             HashSet<Integer> currentStates = epsilonClosure(startState.getId());
             
-            // process each character
+
             for (int i = 0; i < input.length(); i++) {
                 char c = input.charAt(i);
                 HashSet<Integer> nextStates = new HashSet<>();
                 
-                // get all states reachable from current states on c
+                //get all states
                 for (Integer stateId : currentStates) {
                     HashSet<Integer> reachable = getNext(stateId, c);
                     nextStates.addAll(reachable);
                 }
                 
-                // no transitions available
+
                 if (nextStates.isEmpty()) {
                     return false;
                 }
                 
-                // apply epsilon closure
+                //  epsiln closure
                 HashSet<Integer> newCurrentStates = new HashSet<>();
                 for (Integer stateId : nextStates) {
                     HashSet<Integer> closure = epsilonClosure(stateId);
