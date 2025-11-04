@@ -76,6 +76,13 @@ Clean up b4 we create github
         public Character getArg() { return arg; }
     }
 
+
+
+
+
+
+
+
     class Nfa extends Fa { //Nfa class that implements these features
         
         @Override
@@ -87,11 +94,11 @@ Clean up b4 we create github
             transition.add(new Transition(toState, fromState, arg));
         
             if (!transitionTable.containsKey(from)) {
-                transitionTable.put(from, new HashMap<>());
+                 transitionTable.put(from, new HashMap<>());
             }
             
             if (!transitionTable.get(from).containsKey(arg)) {
-                transitionTable.get(from).put(arg, new HashSet<>());
+               transitionTable.get(from).put(arg, new HashSet<>());
             }
             
             transitionTable.get(from).get(arg).add(to); 
@@ -112,13 +119,11 @@ Clean up b4 we create github
                 
                 // c epsilon transitions  = (\0)
                 if (transitionTable.get(current) != null) {
-                    if (transitionTable.get(current).containsKey('\0')) { 
-                        for (Integer next : transitionTable.get(current).get('\0')) { // adding all possible states that can be travelled to with ep closer
-                            if (!visited.contains(next)) {
-                                stack.push(next);
-                            }
-                        }
-                    }
+                  if (transitionTable.get(current).containsKey('\0')) { 
+                     for (Integer next : transitionTable.get(current).get('\0')) { // adding all possible states that can be travelled to with ep closer
+                        if (!visited.contains(next)) {
+                            stack.push(next);
+        }}}
                 }
             }
             return visited;
@@ -131,10 +136,8 @@ Clean up b4 we create github
             
             if (transitionTable.get(stateId) != null) {
                 if (transitionTable.get(stateId).containsKey(symbol)) {
-                    result.addAll(transitionTable.get(stateId).get(symbol));
-                }
-            }
-            
+                result.addAll(transitionTable.get(stateId).get(symbol));
+                }}
             return result;
         }
 
@@ -143,20 +146,18 @@ Clean up b4 we create github
             for (Integer stateId : states.keySet()) {
                 Map<Character, HashSet<Integer>> trans = transitionTable.get(stateId);
                 if (trans != null && trans.containsKey('\0')) {
-                    return false;  
+                return false;  
                 }
             }
                    for (Integer stateId : states.keySet()) {
                 Map<Character, HashSet<Integer>> trans = transitionTable.get(stateId);
                 if (trans != null) {
                     for (Character symbol : trans.keySet()) {
-                        if (trans.get(symbol).size() > 1) {
+                     if (trans.get(symbol).size() > 1) {
                             return false;  // multiple transitions
-                        }
-                    }
+                        }}
                 }
-            }
-            
+            }   
             return true;
         }
 
@@ -166,7 +167,7 @@ Clean up b4 we create github
             ArrayList<HashSet<Integer>> worklist = new ArrayList<>(); // what states still need to be worked on
             int count = 0; // new ids
             
-            HashSet<Integer> startSet = epsilonClosure(startState.getId());
+             HashSet<Integer> startSet = epsilonClosure(startState.getId());
             worklist.add(startSet);
             stateMap.put(startSet, count);
             
@@ -174,7 +175,7 @@ Clean up b4 we create github
           
              boolean startAccepting = false;
             for (Integer id : startSet) {
-                if (states.get(id).checkFinal()) {
+                if (states.get(id).checkFinal()){
                     startAccepting = true;
                     break;
                 }
@@ -184,23 +185,22 @@ Clean up b4 we create github
             count++;
             
             int i = 0;
-            while (i < worklist.size()) {
+            while (i < worklist.size()){
                 HashSet<Integer> currentSet = worklist.get(i);
                 i++;
                 
                 
-                for (Character c : alphabet) {
+                for (Character c : alphabet)  {
                     if (c == '\0') continue;  //skips all eps
                     
                     HashSet<Integer> nextSet = new HashSet<>();
-                    
-                    // 
-                    for (Integer stateId : currentSet) {
+                 
+                    for (Integer stateId : currentSet)  {
                         HashSet<Integer> reachable = getNext(stateId, c);
                         nextSet.addAll(reachable);
                     }
                     
-                    if (nextSet.isEmpty()) 
+                 if (nextSet.isEmpty()) 
                         continue;
                     
                     
@@ -210,6 +210,9 @@ Clean up b4 we create github
                         closedSet.addAll(closure);
                     }
                     
+
+
+    
                     if (!stateMap.containsKey(closedSet)) {
                         stateMap.put(closedSet, count);
                         worklist.add(closedSet);
@@ -217,11 +220,11 @@ Clean up b4 we create github
                         for (Integer id : closedSet) {
                             if (states.get(id).checkFinal()) {
                                 accepting = true;
-                                break;
+                            break;
                             }
                         }
                         
-                        dfa.addState(new State(count, false, accepting));
+                         dfa.addState(new State(count, false, accepting));
                         count++;
                     }
                     
@@ -239,8 +242,6 @@ Clean up b4 we create github
         Boolean accepts(String input) { //added accepts last as other funcitons example epsilon closure and next make the implementation far easier
    
             HashSet<Integer> currentStates = epsilonClosure(startState.getId());
-            
-
             for (int i = 0; i < input.length(); i++) {
                 char c = input.charAt(i);
                 HashSet<Integer> nextStates = new HashSet<>();
@@ -250,26 +251,24 @@ Clean up b4 we create github
                     HashSet<Integer> reachable = getNext(stateId, c);
                     nextStates.addAll(reachable);
                 }
-                
 
                 if (nextStates.isEmpty()) {
                     return false;
                 }
-                
                 //  epsiln closure
                 HashSet<Integer> newCurrentStates = new HashSet<>();
-                for (Integer stateId : nextStates) {
-                    HashSet<Integer> closure = epsilonClosure(stateId);
-                    newCurrentStates.addAll(closure);
-                }
-                
+                    for (Integer stateId : nextStates) {
+                        HashSet<Integer> closure = epsilonClosure(stateId);
+                        newCurrentStates.addAll(closure);
+                    }
+                    
                 currentStates = newCurrentStates;
             }
             
             // check if we ended in an accepting state
             for (Integer stateId : currentStates) {
                 if (states.get(stateId).checkFinal()) {
-                    return true;
+                return true;
                 }
             }
             
@@ -280,27 +279,33 @@ Clean up b4 we create github
 public class javaFa {
     public static void main(String[] args) {
 
-        Nfa nfa = new Nfa();
+        Nfa test = new Nfa();
         
-        nfa.addState(new State(0, true, false));   // start
-        nfa.addState(new State(1, false, true));   // accept
-
-        nfa.addTransition(1, 0, 'a');
+        test.addState(new State(0, true, false));   
+        test.addState(new State(1, false, true));   
+        test.addTransition(1, 0, 'a');
         
+      
         // Test 1
-        System.out.println("'a': " + nfa.accepts("a"));   // true
-        System.out.println("'b': " + nfa.accepts("b"));   // false
+        System.out.println("'a': " + test.accepts("a"));   // true
+        System.out.println("'b': " + test.accepts("b"));   // false
         
+       
         
+
         // Test 2
-        Nfa nfa2 = new Nfa();
-        nfa2.addState(new State(0, true, false));
-        nfa2.addState(new State(1, false, true));
-        nfa2.addTransition(0, 0, 'x');  
-        nfa2.addTransition(1, 0, 'x'); 
+        Nfa test2 = new Nfa();
+       
+        test2.addState(new State(0, true, false));
+       
+        test2.addState(new State(1, false, true));
+       
+        test2.addTransition(0, 0, 'x');  
+        test2.addTransition(1, 0, 'x'); 
         
-        System.out.println("\nBefore: " + nfa2.isDeterministic());  // false
-        Nfa dfa = nfa2.convertToDFA();
+        System.out.println("\nBefore: " + test2.isDeterministic());  // false
+       
+        Nfa dfa = test2.convertToDFA();
         System.out.println("After: " + dfa.isDeterministic());       // true
         System.out.println("'x': " + dfa.accepts("x"));              // true
     }
