@@ -45,8 +45,7 @@ next(Start,Symbol,Answer) :-
     list_to_set(allPossible,Answer).
 
 deterministic :-
-    transition(_ , ep , _),
-    
+    +\transition(_ , ep , _),
     +\(state(From),
         transition(From,Sym, To),
         transition(From,Sym, To2),
