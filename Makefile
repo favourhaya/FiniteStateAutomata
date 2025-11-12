@@ -1,8 +1,7 @@
 Java-build:
-	javac -d dist javaVersion/javaFa.java
+	javac -d dist JavaFa/javaFa.java
 
 Java-run:
-	java -cp dist javaVersion.javaFa
-
+	java -cp dist JavaFa/javaFa
 clean:
 	rm -rf dist/*
